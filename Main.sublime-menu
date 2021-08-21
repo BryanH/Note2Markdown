@@ -1,0 +1,14 @@
+[
+    {
+        "caption": "Edit",
+        "children":
+        [
+            {
+                "caption": "Note to markdown",
+                "command": "note2md",
+                "id": "note2md"
+            }
+        ],
+        "id": "edit"
+    }
+]
