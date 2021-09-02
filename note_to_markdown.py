@@ -30,6 +30,22 @@ def prev_line(view, pt):
     return view.line(pt).a - 1
 
 
+def set_pref(view, name, value):
+    view.settings().set(name, value)
+
+
+def check_syntax(synt):
+    a = synt.get('syntax')
+    # TODO - assign-syntax(syntax)
+    sublime.message_dialog("Le syntax is [" + a + "]")
+    # TODO - if current syntax is text, then go for it
+
+
+def set_syntax_to_md():
+    a = ""
+    # TODO
+
+
 def filenameify(title):
     todays = datetime.now()
     nopunct = re.compile(r'[\"\'\\\/\$\%\#\@=+\^]+')
@@ -46,11 +62,11 @@ def filenameify(title):
 
 class Note2mdCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-
         sublime.log_result_regex(True)
         sublime.log_commands(True)
 
-        firstLine = "# The Quick Brown Fox"
+        check_syntax(self.view.settings())
+
         # Get the contents of the first line
         point = self.view.text_point(0, 0)
         firstLineRegion = self.view.line(point)

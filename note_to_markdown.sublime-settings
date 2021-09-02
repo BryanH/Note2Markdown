@@ -1,0 +1,13 @@
+// NoteToMarkdown default settings.
+//
+// In order to tweak the settings, you should NOT edit this file, but instead
+// the user-specific, empty-by-default version under
+// "Preferences / Package Settings / note_to_markdown / Settings - User".
+//
+{
+    "extension": "md",
+    "prefix-format": "%Y%m%d_%H%M-",
+
+    "substitution-space": "_",
+    "substitution-punct": ""
+}
