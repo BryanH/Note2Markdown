@@ -1,12 +1,36 @@
 [
     {
-        "caption": "Edit",
         "children":
         [
             {
+                "id": "end"
+            },
+            {
+                "caption": "-",
+                "id": "not_an_id_anyway"
+            },
+            {
                 "caption": "Note to markdown",
-                "command": "note2md",
+                "command": "note2_md",
                 "id": "note2md"
+            },
+            {
+                "caption": "Note to markdown settings",
+                "children":
+                [
+                    {
+                        "args":
+                        {
+                            "package_name": "Note2md",
+                            "settings_name": "Note2md.sublime-settings"
+                        },
+                        "caption": "User settings",
+                        "command": "generate_user_settings"
+                    }
+                ]
+            },
+            {
+                "caption": "="
             }
         ],
         "id": "edit"

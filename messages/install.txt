@@ -1,0 +1,18 @@
+Note 2 Markdown
+---------------
+
+This plugin is used to make it easy to take notes in markdown.
+
+To use, write your notes and use markdown formatting.
+
+IMPORTANT: the first line should be a top-level header; this will be the base filename.
+
+Instructions
+============
+
+Select the 'Note to Markdown' command from the Edit menu.
+
+You will get a pop-up save; pick the correct directory and save it.
+
+That's it!
+

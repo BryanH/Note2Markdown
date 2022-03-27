@@ -1,3 +1,4 @@
+import os
 import re
 import sublime
 import sublime_plugin
@@ -31,83 +32,24 @@ SETTINGS_KEYS = [
                   "substitution-punt"
                 ]
 
-
-def next_line(view, pt):
-    return view.line(pt).b + 1
-
-
-def prev_line(view, pt):
-    return view.line(pt).a - 1
-
-
-def set_pref(view, name, value):
-    view.settings().set(name, value)
-
-
-def check_syntax(synt):
-    a = synt.get('syntax')
-    # TODO - assign-syntax(syntax)
-    sublime.message_dialog("Le syntax is [" + a + "]")
-    # TODO - if current syntax is text, then go for it
+class GenerateUserSettingsCommand(sublime_plugin.WindowCommand):
+    def run(self, package_name, settings_name):
+        fpath = os.path.join(sublime.packages_path(), "User", settings_name)
+        if not os.path.exists(fpath):
+            try:
+                content = sublime.load_resource("Packages/{0}/{1}".format(
+                    package_name, settings_name))
+                print("Content: " + content)
+                with open(fpath, "w") as f:
+                    f.write(content)
+            except:
+                print("Error setting up default settings.")
+        else:
+            print(settings_name + " already exists, no action")
+        self.window.open_file(fpath)
 
 
-def save_handler(results):
-
-    # view = sublime.View().view
-    view = self.view
-    if results is None:
-        a = 0
-        sublime.message_dialog("Looks like they didn't save")
-        view.set_status("save", "Didn't save")
-    else:
-        try:
-            view.set_status("save", "Saved to " + results)
-            f = open(results, 'w')
-
-            # This isn't working:
-            f.write(view.substr(sublime.Region(0, view.size())))
-            f.close()
-            # sublime.status("They saved! [" + results + "]")
-        except Exception as error:
-            sublime.error_message('Unable to save file: [{0}]'.format(error))
-            return None
-
-
-def saveit(fname, extension):
-    sublime.save_dialog(save_handler,
-                        None,
-                        None,
-                        fname,
-                        extension)
-
-
-def filenameify(title, settings):
-    todays = datetime.now()
-    nopunct = re.compile(r'[\.\"\'\\\/\$\%\#\@=+\^]+')
-    nospace = re.compile(r'\s+')
-    extension = settings['extension']
-    time_format = settings['prefix-format']
-    delimiter_space = settings['substitution-space']
-
-    # delimiter_punct = settings['substitution-punct']
-    fixed = nospace.sub(delimiter_space, title.lower().strip(' #.\t\n\r'))
-    fixed1 = nopunct.sub(r'+', fixed)
-    return todays.strftime(time_format) + fixed1 + r'.' + extension
-
-
-def get_settings(view):
-    settings_vals = {}
-    settings = sublime.load_settings("note_to_markdown.sublime-settings")
-    for key in SETTINGS_KEYS:
-        settings_vals[key] = settings.get(key)
-
-    # sublime.message_dialog("Extention is [{extension}]"
-    #                        .format(**settings_vals))
-
-    return settings_vals
-
-
-class Note2mdCommand(sublime_plugin.TextCommand):
+class Note2MdCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.set_status("A", "Note2MD started")
         sublime.log_result_regex(True)
@@ -122,3 +64,77 @@ class Note2mdCommand(sublime_plugin.TextCommand):
         saveit(filenameify(firstLine, settings), settings['extension'])
         self.view.erase_status("A")
         # self.view.insert(edit, point, filenameify(firstLine))
+
+    def next_line(view, pt):
+        return view.line(pt).b + 1
+
+
+    def prev_line(view, pt):
+        return view.line(pt).a - 1
+
+
+    def set_pref(view, name, value):
+        view.settings().set(name, value)
+
+
+    def check_syntax(synt):
+        a = synt.get('syntax')
+        # TODO - assign-syntax(syntax)
+        sublime.message_dialog("Le syntax is [" + a + "]")
+        # TODO - if current syntax is text, then go for it
+
+
+    def save_handler(results):
+
+        # view = sublime.View().view
+        view = self.view
+        if results is None:
+            a = 0
+            sublime.message_dialog("Looks like they didn't save")
+            view.set_status("save", "Didn't save")
+        else:
+            try:
+                view.set_status("save", "Saved to " + results)
+                f = open(results, 'w')
+
+                # This isn't working:
+                f.write(view.substr(sublime.Region(0, view.size())))
+                f.close()
+                # sublime.status("They saved! [" + results + "]")
+            except Exception as error:
+                sublime.error_message('Unable to save file: [{0}]'.format(error))
+                return None
+
+
+    def saveit(fname, extension):
+        sublime.save_dialog(save_handler,
+                            None,
+                            None,
+                            fname,
+                            extension)
+
+
+    def filenameify(title, settings):
+        todays = datetime.now()
+        nopunct = re.compile(r'[\.\"\'\\\/\$\%\#\@=+\^]+')
+        nospace = re.compile(r'\s+')
+        extension = settings['extension']
+        time_format = settings['prefix-format']
+        delimiter_space = settings['substitution-space']
+
+        # delimiter_punct = settings['substitution-punct']
+        fixed = nospace.sub(delimiter_space, title.lower().strip(' #.\t\n\r'))
+        fixed1 = nopunct.sub(r'+', fixed)
+        return todays.strftime(time_format) + fixed1 + r'.' + extension
+
+
+    def get_settings(view):
+        settings_vals = {}
+        settings = sublime.load_settings("Note2md.sublime-settings")
+        for key in SETTINGS_KEYS:
+            settings_vals[key] = settings.get(key)
+
+        # sublime.message_dialog("Extention is [{extension}]"
+        #                        .format(**settings_vals))
+
+        return settings_vals
