@@ -52,10 +52,14 @@ class GenerateUserSettingsCommand(sublime_plugin.WindowCommand):
 class Note2MdCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view
+        if not( view.is_dirty()):
+            sublime.message_dialog("File already saved. Aborting.")
+            return
+
         view.set_status("A", "Note2MD started")
         sublime.log_result_regex(True)
         sublime.log_commands(True)
-        settings = self.get_settings(view)
+        settings = self.get_settings()
         self.check_syntax(self.view.settings())
 
         # Get the contents of the first line
@@ -81,8 +85,7 @@ class Note2MdCommand(sublime_plugin.TextCommand):
     def check_syntax(self, synt):
         a = synt.get('syntax')
         # TODO - assign-syntax(syntax)
-        view.set_status
-        # sublime.message_dialog("Le syntax is [" + a + "]")
+        # self.view.set_status("check", "Le syntax is [" + a + "]")
         # TODO - if current syntax is text, then go for it
 
 
@@ -94,16 +97,21 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             a = 0
             view.set_status("save", "Didn't save")
         else:
+            view.erase_status("check")
+            view.set_status("save", "Saving...")
+
+            content = view.substr(sublime.Region(0, view.size()))
+            sublime.message_dialog(content)
             try:
-
-                view.set_status("save", "Saving...")
-                f = open(results, 'w')
-
-                # This isn't working:
-                f.write(view.substr(sublime.Region(0, view.size())))
-                f.close()
+                with open(results, 'w', encoding='utf-8') as f:
+                    f.write(content)
 
                 view.set_status("save", "Saved to " + results)
+                # This isn't working:
+
+
+                # f.write(view.substr(sublime.Region(0, view.size())))
+                # f.close()
             except Exception as error:
                 sublime.error_message('Unable to save file: [{0}]'.format(error))
                 return None
@@ -131,7 +139,7 @@ class Note2MdCommand(sublime_plugin.TextCommand):
         return todays.strftime(time_format) + fixed1 + r'.' + extension
 
 
-    def get_settings(self, view):
+    def get_settings(self):
         settings_vals = {}
         settings = sublime.load_settings("Note2Md.sublime-settings")
         for key in SETTINGS_KEYS:
