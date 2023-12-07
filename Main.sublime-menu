@@ -1,5 +1,45 @@
 [
     {
+        "caption": "Preferences",
+        "id": "preferences",
+        "mnemonic": "n",
+        "children": [
+            {
+                "caption": "Package Settings",
+                "mnemonic": "P",
+                "id": "package-settings",
+                "children": [
+                    {
+                        "caption": "Note2Markdown",
+                        "children": [
+                            {
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/note_to_markdown/README.rst"
+                                },
+                                "caption": "README"
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/note_to_markdown/Note2Md.sublime-settings"
+                                },
+                                "caption": "Settings"
+                            },
+                            {
+                                "caption": "-"
+                            }
+                        ]
+                    }
+                ]
+            } ]
+    },
+    {
+        "caption": "Edit",
+        "id": "edit",
         "children":
         [
             {
