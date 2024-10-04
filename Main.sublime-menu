@@ -12,21 +12,6 @@
                 "id": "note2md"
             },
             {
-                "caption": "Note to markdown settings",
-                "children":
-                [
-                    {
-                        "args":
-                        {
-                            "package_name": "Note2md",
-                            "settings_name": "Note2md.sublime-settings"
-                        },
-                        "caption": "User settings",
-                        "command": "generate_user_settings"
-                    }
-                ]
-            },
-            {
                 "caption": "="
             }
         ]
