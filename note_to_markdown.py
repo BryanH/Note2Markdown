@@ -1,3 +1,4 @@
+"""note_to_markdown.py"""
 import os
 import re
 import sublime
@@ -16,7 +17,6 @@ from datetime import datetime
 #    suffix it with markdown extension
 # Open save dialog with the filename as generated above
 #
-# TODO: date format from preferences
 # TODO: word delimiter from preferences
 #
 # Check the validity of this script by:
@@ -32,27 +32,31 @@ SETTINGS_KEYS = [
                   "substitution-punt"
                 ]
 
-class GenerateUserSettingsCommand(sublime_plugin.WindowCommand):
-    def run(self, package_name, settings_name):
-        fpath = os.path.join(sublime.packages_path(), "User", settings_name)
-        if not os.path.exists(fpath):
-            try:
-                content = sublime.load_resource("Packages/{0}/{1}".format(
-                    package_name, settings_name))
-                print("Content: " + content)
-                with open(fpath, "w") as f:
-                    f.write(content)
-            except:
-                print("Error setting up default settings.")
-        else:
-            print(settings_name + " already exists, no action")
-        self.window.open_file(fpath)
+# class GenerateUserSettingsCommand(sublime_plugin.WindowCommand):
+#     """Create the user settings if they don't exist"""
+#     def run(self, package_name, settings_name):
+#         """default"""
+#         fpath = os.path.join(sublime.packages_path(), "User", settings_name)
+#         if not os.path.exists(fpath):
+#             try:
+#                 content = sublime.load_resource(f"Packages/{0}/{1}".format(
+#                     package_name, settings_name))
+#                 print(f"Content: {content}")
+#                 with open(fpath, "w", encoding="utf-8") as f:
+#                     f.write(content)
+#             except:
+#                 print("Error setting up default settings.")
+#         else:
+#             print(settings_name + " already exists, no action")
+#         self.window.open_file(fpath)
 
 
 class Note2MdCommand(sublime_plugin.TextCommand):
+    """ Plugin Class """
     def run(self, edit):
+        """Main Loop"""
         view = self.view
-        if not( view.is_dirty()):
+        if not view.is_dirty():
             sublime.message_dialog("File already saved. Aborting.")
             return
 
@@ -64,37 +68,39 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
         # Get the contents of the first line
         point = view.text_point(0, 0)
-        firstLineRegion = view.line(point)
-        firstLine = view.substr(firstLineRegion)
-        self.saveit(self.filenameify(firstLine, settings), settings['extension'])
+        first_line_region = view.line(point)
+        first_line = view.substr(first_line_region)
+        self.saveit(self.filenameify(first_line, settings), settings['extension'])
         view.erase_status("A")
-        # self.view.insert(edit, point, filenameify(firstLine))
+        # self.view.insert(edit, point, filenameify(first_line))
 
-    def next_line(view, pt):
+    def next_line(self, view, pt):
+        """return the line number of the line below the current line"""
         return view.line(pt).b + 1
 
 
-    def prev_line(view, pt):
+    def prev_line(self, view, pt):
+        """return the line number of the line above the current line"""
         return view.line(pt).a - 1
 
 
-    def set_pref(view, name, value):
+    def set_pref(self, view, name, value):
+        """Update (set) the preferences settings"""
         view.settings().set(name, value)
 
 
     def check_syntax(self, synt):
+        """TODO"""
         a = synt.get('syntax')
         # TODO - assign-syntax(syntax)
         # self.view.set_status("check", "Le syntax is [" + a + "]")
         # TODO - if current syntax is text, then go for it
 
-
     def save_handler(self, results):
-
+        """Saves the document into the filename selected"""
         # view = sublime.View().view
         view = self.view
         if results is None:
-            a = 0
             view.set_status("save", "Didn't save")
         else:
             view.erase_status("check")
@@ -113,19 +119,18 @@ class Note2MdCommand(sublime_plugin.TextCommand):
                 # f.write(view.substr(sublime.Region(0, view.size())))
                 # f.close()
             except Exception as error:
-                sublime.error_message('Unable to save file: [{0}]'.format(error))
-                return None
-
+                sublime.error_message(f'Unable to save file: [{0}]'.format(error))
 
     def saveit(self, fname, extension):
+        """Open save dialog, it will call the save_handler"""
         sublime.save_dialog(self.save_handler,
                             None,
                             None,
                             fname,
                             extension)
 
-
     def filenameify(self, title, settings):
+        """Format the filename to save as"""
         todays = datetime.now()
         nopunct = re.compile(r'[\.\"\'\\\/\$\%\#\@=+\^]+')
         nospace = re.compile(r'\s+')
@@ -140,6 +145,7 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
 
     def get_settings(self):
+        """Retrieve existing preferences"""
         settings_vals = {}
         settings = sublime.load_settings("Note2Md.sublime-settings")
         for key in SETTINGS_KEYS:
