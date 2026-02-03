@@ -1,0 +1,6 @@
+{
+  "name": "Note2Markdown",
+  "description": "Converts text notes (with embedded markdown tags) to markdown file, saved with timestamp filename.",
+  "homepage": "https://github.com/BryanH/Note2Markdown",
+  "version": "0.1.0"
+}
