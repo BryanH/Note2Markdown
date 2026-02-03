@@ -10,7 +10,7 @@ IMPORTANT: the first line should be a top-level header; this will be the base fi
 Instructions
 ============
 
-Select the 'Note to Markdown' command from the Edit menu.
+Select the 'Note to Markdown' command from the Tools menu.
 
 You will get a pop-up save; pick the correct directory and save it.
 

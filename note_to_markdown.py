@@ -1,10 +1,10 @@
 """note_to_markdown.py"""
-import os
+
 import re
+from datetime import datetime
+
 import sublime
 import sublime_plugin
-
-from datetime import datetime
 # from datetime import date
 
 # note_to_markdown.py
@@ -25,6 +25,7 @@ from datetime import datetime
 # delimiter_space = "_"
 # delimiter_punct = ""
 # extension = "md"
+
 SETTINGS_KEYS = [
                   "extension",
                   "prefix-format",
@@ -32,28 +33,9 @@ SETTINGS_KEYS = [
                   "substitution-punt"
                 ]
 
-# class GenerateUserSettingsCommand(sublime_plugin.WindowCommand):
-#     """Create the user settings if they don't exist"""
-#     def run(self, package_name, settings_name):
-#         """default"""
-#         fpath = os.path.join(sublime.packages_path(), "User", settings_name)
-#         if not os.path.exists(fpath):
-#             try:
-#                 content = sublime.load_resource(f"Packages/{0}/{1}".format(
-#                     package_name, settings_name))
-#                 print(f"Content: {content}")
-#                 with open(fpath, "w", encoding="utf-8") as f:
-#                     f.write(content)
-#             except:
-#                 print("Error setting up default settings.")
-#         else:
-#             print(settings_name + " already exists, no action")
-#         self.window.open_file(fpath)
-
-
 class Note2MdCommand(sublime_plugin.TextCommand):
     """ Plugin Class """
-    def run(self, edit):
+    def run(self, _):
         """Main Loop"""
         view = self.view
         if not view.is_dirty():
@@ -90,11 +72,12 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
 
     def check_syntax(self, synt):
-        """TODO"""
+        """Not sure what this is for"""
+        # TODO: is this trying to see if the file syntax is "Markdown"/"Multimarkdown"?
         a = synt.get('syntax')
-        # TODO - assign-syntax(syntax)
-        # self.view.set_status("check", "Le syntax is [" + a + "]")
-        # TODO - if current syntax is text, then go for it
+        # TODO: assign-syntax(syntax)
+        self.view.set_status("check", "Le syntax is [" + a + "]")
+        # TODO: if current syntax is text, then go for it
 
     def save_handler(self, results):
         """Saves the document into the filename selected"""
@@ -118,7 +101,7 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
                 # f.write(view.substr(sublime.Region(0, view.size())))
                 # f.close()
-            except Exception as error:
+            except OSError as error:
                 sublime.error_message(f'Unable to save file: [{0}]'.format(error))
 
     def saveit(self, fname, extension):
@@ -151,7 +134,10 @@ class Note2MdCommand(sublime_plugin.TextCommand):
         for key in SETTINGS_KEYS:
             settings_vals[key] = settings.get(key)
 
-        # sublime.message_dialog("Extention is [{extension}], prefix format [{prefix-format}], sub-space [{substitution-space}]"
-        #                        .format(**settings_vals))
+        sublime.message_dialog(
+            ("Extention is [{extension}],"
+            " prefix format [{prefix-format}],"
+            " sub-space [{substitution-space}]")
+            , **settings_vals)
 
         return settings_vals
