@@ -27,15 +27,17 @@ import sublime_plugin
 # extension = "md"
 
 SETTINGS_KEYS = [
-                  "extension",
-                  "prefix-format",
-                  "substitution-space",
-                  "substitution-punct",
-                  "debug"
-                ]
+    "extension",
+    "prefix-format",
+    "substitution-space",
+    "substitution-punct",
+    "debug",
+]
+
 
 class Note2MdCommand(sublime_plugin.TextCommand):
-    """ Plugin Class """
+    """Plugin Class"""
+
     def run(self, _):
         """Main Loop"""
         view = self.view
@@ -43,36 +45,32 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             sublime.message_dialog("File already saved. Aborting.")
             return
 
-
         sublime.log_result_regex(True)
         sublime.log_commands(True)
         settings = self.get_settings()
         self.check_syntax(self.view.settings())
-        if settings['debug']:
+        if settings["debug"]:
             view.set_status("A", "Note2MD started")
 
         # Get the contents of the first line
         point = view.text_point(0, 0)
         first_line_region = view.line(point)
         first_line = view.substr(first_line_region)
-        self.saveit(self.filenameify(first_line, settings), settings['extension'])
-        if settings['debug']:
+        self.saveit(self.filenameify(first_line, settings), settings["extension"])
+        if settings["debug"]:
             view.erase_status("A")
 
     def next_line(self, view, pt):
         """return the line number of the line below the current line"""
         return view.line(pt).b + 1
 
-
     def prev_line(self, view, pt):
         """return the line number of the line above the current line"""
         return view.line(pt).a - 1
 
-
     def set_pref(self, view, name, value):
         """Update (set) the preferences settings"""
         view.settings().set(name, value)
-
 
     def check_syntax(self, synt):
         """Not sure what this is for"""
@@ -80,9 +78,9 @@ class Note2MdCommand(sublime_plugin.TextCommand):
         settings = self.get_settings()
 
         # TODO: is this trying to see if the file syntax is "Markdown"/"Multimarkdown"?
-        a = synt.get('syntax')
+        a = synt.get("syntax")
         # TODO: assign-syntax(syntax)
-        if settings['debug']:
+        if settings["debug"]:
             self.view.set_status("check", "Le syntax is [" + a + "]")
         # TODO: if current syntax is text, then go for it
 
@@ -100,9 +98,9 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             content = view.substr(sublime.Region(0, view.size()))
             sublime.message_dialog(content)
             try:
-                with open(results, 'w', encoding='utf-8') as f:
+                with open(results, "w", encoding="utf-8") as f:
                     f.write(content)
-                if settings['debug']:
+                if settings["debug"]:
                     view.set_status("save", "Saved to " + results)
 
                 # TODO This isn't working:
@@ -110,30 +108,25 @@ class Note2MdCommand(sublime_plugin.TextCommand):
                 # f.close()
 
             except OSError as error:
-                sublime.error_message(f'Unable to save file: [{0}]'.format(error))
+                sublime.error_message(f"Unable to save file: [{0}]".format(error))
 
     def saveit(self, fname, extension):
         """Open save dialog, it will call the save_handler"""
-        sublime.save_dialog(self.save_handler,
-                            None,
-                            None,
-                            fname,
-                            extension)
+        sublime.save_dialog(self.save_handler, None, None, fname, extension)
 
     def filenameify(self, title, settings):
         """Format the filename to save as"""
         todays = datetime.now()
-        nopunct = re.compile(r'[\.\"\'\\\/\$\%\#\@=+\^]+')
-        nospace = re.compile(r'\s+')
-        extension = settings['extension']
-        time_format = settings['prefix-format']
-        delimiter_space = settings['substitution-space']
+        nopunct = re.compile(r"[\.\"\'\\\/\$\%\#\@=+\^]+")
+        nospace = re.compile(r"\s+")
+        extension = settings["extension"]
+        time_format = settings["prefix-format"]
+        delimiter_space = settings["substitution-space"]
 
         # delimiter_punct = settings['substitution-punct']
-        fixed = nospace.sub(delimiter_space, title.lower().strip(' #.\t\n\r'))
-        fixed1 = nopunct.sub(r'+', fixed)
-        return todays.strftime(time_format) + fixed1 + r'.' + extension
-
+        fixed = nospace.sub(delimiter_space, title.lower().strip(" #.\t\n\r"))
+        fixed1 = nopunct.sub(r"+", fixed)
+        return todays.strftime(time_format) + fixed1 + r"." + extension
 
     def get_settings(self):
         """Retrieve existing preferences from default and user"""
@@ -141,14 +134,15 @@ class Note2MdCommand(sublime_plugin.TextCommand):
         settings = sublime.load_settings("Note2Md.sublime-settings")
         for key in SETTINGS_KEYS:
             settings_vals[key] = settings.get(key)
-        if settings['debug']:
+        if settings["debug"]:
             sublime.message_dialog(
-                (f"Extention is [{settings['extension']}],"
-                f" prefix format [{settings['prefix-format']}],"
-                f" sub-space [{settings['substitution-space']}], "
-                f" sub-punct [{settings['substitution-punct']}], "
-                f" debug [{settings['debug']}]")
-                # .format(**settings_vals)
+                (
+                    f"Extention is [{settings['extension']}],"
+                    f" prefix format [{settings['prefix-format']}],"
+                    f" sub-space [{settings['substitution-space']}], "
+                    f" sub-punct [{settings['substitution-punct']}], "
+                    f" debug [{settings['debug']}]"
                 )
+            )
 
         return settings_vals
