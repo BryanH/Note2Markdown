@@ -52,7 +52,6 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             view.set_status("A", "Note2MD started")
 
             # Flood the console with everything the user does
-            # TODO: This isn't doing it - review what these do and document
             sublime.log_commands(True)
             sublime.log_result_regex(True)
 
@@ -123,6 +122,8 @@ class Note2MdCommand(sublime_plugin.TextCommand):
     def saveit(self, fname, extension):
         """Open save dialog, it will call the save_handler"""
 
+        # Stop Flooding the console with all the things
+        sublime.log_commands(False)
         sublime.save_dialog(self.save_handler, None, None, fname, extension)
 
     def filenameify(self, title, settings):
