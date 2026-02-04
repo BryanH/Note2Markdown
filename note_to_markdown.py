@@ -30,7 +30,8 @@ SETTINGS_KEYS = [
                   "extension",
                   "prefix-format",
                   "substitution-space",
-                  "substitution-punt"
+                  "substitution-punct",
+                  "debug"
                 ]
 
 class Note2MdCommand(sublime_plugin.TextCommand):
@@ -42,19 +43,21 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             sublime.message_dialog("File already saved. Aborting.")
             return
 
-        view.set_status("A", "Note2MD started")
+
         sublime.log_result_regex(True)
         sublime.log_commands(True)
         settings = self.get_settings()
         self.check_syntax(self.view.settings())
+        if settings['debug']:
+            view.set_status("A", "Note2MD started")
 
         # Get the contents of the first line
         point = view.text_point(0, 0)
         first_line_region = view.line(point)
         first_line = view.substr(first_line_region)
         self.saveit(self.filenameify(first_line, settings), settings['extension'])
-        view.erase_status("A")
-        # self.view.insert(edit, point, filenameify(first_line))
+        if settings['debug']:
+            view.erase_status("A")
 
     def next_line(self, view, pt):
         """return the line number of the line below the current line"""
@@ -73,16 +76,21 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
     def check_syntax(self, synt):
         """Not sure what this is for"""
+
+        settings = self.get_settings()
+
         # TODO: is this trying to see if the file syntax is "Markdown"/"Multimarkdown"?
         a = synt.get('syntax')
         # TODO: assign-syntax(syntax)
-        self.view.set_status("check", "Le syntax is [" + a + "]")
+        if settings['debug']:
+            self.view.set_status("check", "Le syntax is [" + a + "]")
         # TODO: if current syntax is text, then go for it
 
     def save_handler(self, results):
         """Saves the document into the filename selected"""
-        # view = sublime.View().view
+
         view = self.view
+        settings = self.get_settings()
         if results is None:
             view.set_status("save", "Didn't save")
         else:
@@ -94,13 +102,13 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             try:
                 with open(results, 'w', encoding='utf-8') as f:
                     f.write(content)
+                if settings['debug']:
+                    view.set_status("save", "Saved to " + results)
 
-                view.set_status("save", "Saved to " + results)
-                # This isn't working:
-
-
+                # TODO This isn't working:
                 # f.write(view.substr(sublime.Region(0, view.size())))
                 # f.close()
+
             except OSError as error:
                 sublime.error_message(f'Unable to save file: [{0}]'.format(error))
 
@@ -128,16 +136,19 @@ class Note2MdCommand(sublime_plugin.TextCommand):
 
 
     def get_settings(self):
-        """Retrieve existing preferences"""
+        """Retrieve existing preferences from default and user"""
         settings_vals = {}
         settings = sublime.load_settings("Note2Md.sublime-settings")
         for key in SETTINGS_KEYS:
             settings_vals[key] = settings.get(key)
-
-        sublime.message_dialog(
-            ("Extention is [{extension}],"
-            " prefix format [{prefix-format}],"
-            " sub-space [{substitution-space}]")
-            , **settings_vals)
+        if settings['debug']:
+            sublime.message_dialog(
+                (f"Extention is [{settings['extension']}],"
+                f" prefix format [{settings['prefix-format']}],"
+                f" sub-space [{settings['substitution-space']}], "
+                f" sub-punct [{settings['substitution-punct']}], "
+                f" debug [{settings['debug']}]")
+                # .format(**settings_vals)
+                )
 
         return settings_vals

@@ -9,5 +9,6 @@
     "prefix-format": "%Y%m%d_%H%M-",
 
     "substitution-space": "_",
-    "substitution-punct": ""
+    "substitution-punct": "",
+    "debug": false
 }
