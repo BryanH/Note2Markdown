@@ -29,7 +29,7 @@
                                 "caption": "README",
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/note_to_markdown/README.rst"
+                                    "file": "${packages}/note_to_markdown/README.md"
                                 }
                             },
                             { "caption": "-" },

@@ -46,12 +46,15 @@ class Note2MdCommand(sublime_plugin.TextCommand):
             sublime.message_dialog("File already saved. Aborting.")
             return
 
-        sublime.log_result_regex(True)
-        sublime.log_commands(True)
         settings = self.get_settings()
         self.check_syntax(self.view.settings())
         if settings["debug"]:
             view.set_status("A", "Note2MD started")
+
+            # Flood the console with everything the user does
+            # TODO: This isn't doing it - review what these do and document
+            sublime.log_commands(True)
+            sublime.log_result_regex(True)
 
         # Get the contents of the first line
         point = view.text_point(0, 0)
